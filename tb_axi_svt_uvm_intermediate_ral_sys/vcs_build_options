@@ -1,0 +1,2 @@
++define+SVT_AXI_INCLUDE_USER_DEFINES +define+UVM_DISABLE_AUTO_ITEM_RECORDING -timescale=1ns/1ps   
+

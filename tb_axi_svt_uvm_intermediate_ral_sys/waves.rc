@@ -1,0 +1,79 @@
+; Created by DVE @Synopsys
+; DVE version: J-2014.12_Full64
+; DVE build date: Nov 21 2014 20:56:01
+
+Revision Verdi3
+
+; Window Layout <x> <y> <width> <height> <signalwidth> <valuewidth>
+; 
+
+; File list:
+
+; file time scale:
+;fileTimeScale ###s|ms|us|ns
+
+; signal spacing:
+signalSpacing 5
+
+; windowTimeUnit is used for zoom, cursor & marker
+windowTimeUnit 1ps
+zoom 0 8300000
+
+; cursor, marker, user define markers
+cursor 249523
+
+
+; toolbar current search type
+curSTATUS ByChange
+
+addGroup "Clock and Reset"
+addSignal -h 15 /test_top/axi_if/master_if[0]/internal_aclk
+addSignal -h 15 /test_top/axi_if/master_if[0]/aresetn
+addGroup "Write Address Channel"
+addSignal -h 15 /test_top/axi_if/master_if[0]/awvalid
+addSignal -h 15 -UNSIGNED -HEX /test_top/axi_if/master_if[0]/awaddr[63:0]
+addSignal -h 15 -UNSIGNED -HEX /test_top/axi_if/master_if[0]/awlen[9:0]
+addSignal -h 15 -UNSIGNED -HEX /test_top/axi_if/master_if[0]/awsize[2:0]
+addSignal -h 15 -UNSIGNED -HEX /test_top/axi_if/master_if[0]/awburst[1:0]
+addSignal -h 15 -UNSIGNED -HEX /test_top/axi_if/master_if[0]/awlock[1:0]
+addSignal -h 15 -UNSIGNED -HEX /test_top/axi_if/master_if[0]/awcache[3:0]
+addSignal -h 15 -UNSIGNED -HEX /test_top/axi_if/master_if[0]/awprot[2:0]
+addSignal -h 15 -UNSIGNED -HEX /test_top/axi_if/master_if[0]/awid[7:0]
+addSignal -h 15 /test_top/axi_if/master_if[0]/awready
+addSignal -h 15 -UNSIGNED -UDEC /test_top/axi_if/master_if[0]/write_addr_xact_num[31:0]
+addGroup "Write Data Channel"
+addSignal -h 15 /test_top/axi_if/master_if[0]/wvalid
+addSignal -h 15 /test_top/axi_if/master_if[0]/wlast
+addSignal -h 15 -UNSIGNED -HEX /test_top/axi_if/master_if[0]/wdata[1023:0]
+addSignal -h 15 -UNSIGNED -HEX /test_top/axi_if/master_if[0]/wstrb[127:0]
+addSignal -h 15 -UNSIGNED -HEX /test_top/axi_if/master_if[0]/wid[7:0]
+addSignal -h 15 /test_top/axi_if/master_if[0]/wready
+addSignal -h 15 -UNSIGNED -UDEC /test_top/axi_if/master_if[0]/write_data_xact_num[31:0]
+addSignal -h 15 -UNSIGNED -HEX /test_top/axi_if/master_if[0]/write_data_xfer_id[31:0]
+addGroup "Write Response Channel"
+addSignal -h 15 /test_top/axi_if/master_if[0]/bvalid
+addSignal -h 15 -UNSIGNED -HEX /test_top/axi_if/master_if[0]/bresp[3:0]
+addSignal -h 15 -UNSIGNED -HEX /test_top/axi_if/master_if[0]/bid[7:0]
+addSignal -h 15 /test_top/axi_if/master_if[0]/bready
+addSignal -h 15 -UNSIGNED -UDEC /test_top/axi_if/master_if[0]/write_resp_xact_num[31:0]
+addGroup "Read Address Channel"
+addSignal -h 15 /test_top/axi_if/master_if[0]/arvalid
+addSignal -h 15 -UNSIGNED -HEX /test_top/axi_if/master_if[0]/araddr[63:0]
+addSignal -h 15 -UNSIGNED -HEX /test_top/axi_if/master_if[0]/arlen[9:0]
+addSignal -h 15 -UNSIGNED -HEX /test_top/axi_if/master_if[0]/arsize[2:0]
+addSignal -h 15 -UNSIGNED -HEX /test_top/axi_if/master_if[0]/arburst[1:0]
+addSignal -h 15 -UNSIGNED -HEX /test_top/axi_if/master_if[0]/arlock[1:0]
+addSignal -h 15 -UNSIGNED -HEX /test_top/axi_if/master_if[0]/arcache[3:0]
+addSignal -h 15 -UNSIGNED -HEX /test_top/axi_if/master_if[0]/arprot[2:0]
+addSignal -h 15 -UNSIGNED -HEX /test_top/axi_if/master_if[0]/arid[7:0]
+addSignal -h 15 /test_top/axi_if/master_if[0]/arready
+addSignal -h 15 -UNSIGNED -UDEC /test_top/axi_if/master_if[0]/read_addr_xact_num[31:0]
+addGroup "Read Data/Resp Channel"
+addSignal -h 15 /test_top/axi_if/master_if[0]/rvalid
+addSignal -h 15 /test_top/axi_if/master_if[0]/rlast
+addSignal -h 15 -UNSIGNED -HEX /test_top/axi_if/master_if[0]/rdata[1023:0]
+addSignal -h 15 /test_top/axi_if/master_if[0]/rready
+addSignal -h 15 -UNSIGNED -HEX /test_top/axi_if/master_if[0]/rresp[3:0]
+addSignal -h 15 -UNSIGNED -HEX /test_top/axi_if/master_if[0]/rid[7:0]
+addSignal -h 15 -UNSIGNED -UDEC /test_top/axi_if/master_if[0]/read_data_xact_num[31:0]
+addSignal -h 15 -UNSIGNED -UDEC /test_top/axi_if/master_if[0]/read_data_xfer_id[31:0]

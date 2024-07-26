@@ -1,0 +1,348 @@
+
+**************************************************************************
+Intermediate UVM Testbench Example for AXI SVT VIP with RAL
+*************************************************************************
+
+CONTENTS:
+A. Introduction
+B. Running the Example Testbench
+C. Files in the Example
+D. SystemVerilog Testbench Description
+E. DVE Configuration File
+F. UVM Verification Environment 
+G. RAL-specific information
+H. Contacting Customer Support
+
+-------------------------------------------------------------------------
+A. Introduction
+-------------------------------------------------------------------------
+
+This example shows how to implement a functioning UVM testbench using AXI
+Verification IP plus RAL. A quickstart navigation guide can be found at:
+    
+<HTML Quickstart is not yet available for this example> 
+
+The RAL description is at the end of this file.
+    
+The example consists of the following:
+
+- A top-level testbench in SystemVerilog
+- A dummy DUT in the testbench, which has 2 AXI interfaces
+- UVM verification environment
+- AXI System Env instantiated in the UVM verification environment
+- A RAL description
+- Eight test files illustrating various RAL functionality
+- Scoreboard
+- Transaction level coverage
+
+The UVM AXI VIP transactors are connected in the following manner:
+
+                              (AXI System ENV)
+   =====================================================================
+  ||   (AXI Master Agent)                         (AXI Slave Agent)    ||
+  ||   -------------------     =============     -------------------   ||
+  ||  | ------   -------  |   |             |   |  -----   -------  |  ||
+  ||  ||Master| |Monitor| |   |    -----    |   | |Slave| |Monitor| |  ||
+  ||  | ------   -------  |~=====>| DUT |<=====~|  -----   -------  |  ||
+  ||  |  *Active Mode*    |   |    -----    |   |   *Active Mode*   |  ||
+  ||   \_________________/    |             |    \_________________/   ||
+  ||                          |             |                          ||
+   ============================             =============================
+
+In the remainder of this description, <design_dir> refers to the directory where
+the example was installed using script dw_vip_setup. The example source files
+would then exist at two locations:
+
+- "$DESIGNWARE_HOME/vip/svt/amba_svt/latest/examples/sverilog/tb_axi_svt_uvm_intermediate_ral_sys"
+- "<design_dir>/examples/sverilog/amba_svt/tb_axi_svt_uvm_intermediate_ral_sys"
+
+Note, the quickstart guide is _only_ available at
+$DESIGNWARE_HOME/vip/svt/amba_svt/latest/examples/sverilog/index.html. The
+quickstart is not installed in <design_dir>. Unless otherwise noted, the files
+described below are also found in <design_dir>.
+
+Complete class reference HTML documentation of AXI SVT UVM Verification 
+IP is available at:
+  
+$DESIGNWARE_HOME/vip/svt/amba_svt/latest/doc/axi_svt_uvm_public/html/index.html
+
+------------------------------------------------------------------------
+B. Running the Example Testbench
+------------------------------------------------------------------------
+
+1. Install the example using the following command line:
+
+   % cd <location where example is to be installed>
+   % mkdir design_dir <provide any name of your choice>
+   % dw_vip_setup -path ./design_dir -e amba_svt/tb_axi_svt_uvm_intermediate_ral_sys -svtb
+
+2. Compile the RAL description
+
+   % cd design_dir/examples/sverilog/amba_svt/tb_axi_svt_uvm_intermediate_ral_sys/env
+   % ralgen -uvm -t axi_intermediate_slave axi_intermediate_ral_slave.ralf
+
+This produces ral_axi_intermediate_slave.sv, which contains the UVM code for the
+register model.
+
+
+3. Use either one of the following to run the testbench:
+
+   a) Use the Makefile:
+
+      Many tests are provided in the "tests" directory.
+      The tests are:
+      1. ts.ral_access_burst_write_read_test.sv
+      2. ts.ral_access_single_write_read_test.sv
+      3. ts.ral_hw_reset.sv
+      4. ts.ral_mem_write_read_test.sv
+      5. ts.ral_reg_write_consecutive_read_test.sv
+      6. ts.ral_reg_write_read_test.sv
+      7. ts.reg_access_test.sv
+      8. ts.reg_bit_bash_test.sv
+      9. ts.uvm_reg_mem_built_in_test.sv
+
+      There are also the original 3 AXI intermediate tests, which are not dicussed here.
+
+      For example, to run test ts.directed_test.sv, do following:
+      
+      gmake USE_SIMULATOR=vcsvlog ral_access_single_write_read_test WAVES=1
+
+      Invoke "gmake help" to show more options.
+   
+   b) Use the sim script:
+
+     For example, to run test ts.ral_access_single_write_read_test.sv, do following:
+
+      ./run_axi_svt_uvm_intermediate_ral_sys -w  ral_access_single_write_read_test vcsvlog
+
+     
+-------------------------------------------------------------------------
+C. Files in the Example
+-------------------------------------------------------------------------
+
+The following lists all the code files in this example.
+
+<top_directory>
+      |
+      |
+      |-> hdl_interconnect
+      |     -> axi_dut.v
+      |     -> axi_dut_sv_wrapper.sv
+      |     -> axi_reg_slave.sv
+      |-> top.sv
+      |-> env
+      |     -> axi_intermediate_ral_env.sv
+      |     -> axi_uvm_scoreboard.sv
+      |     -> axi_base_test.sv
+      |     -> cust_svt_axi_system_configuration.sv
+      |     -> axi_slave_mem_response_sequence.sv
+      |     -> axi_intermediate_ral_slave.ralf
+      |     -> ral_axi_intermediate_slave.sv
+      |     -> svt_axi_user_defines.svi
+      |    
+      |-> tests
+      |     -> ts.axi_ral_base_test.sv
+      |     -> ts.ral_access_burst_write_read_test.sv
+      |     -> ts.ral_access_single_write_read_test.sv
+      |     -> ts.ral_hw_reset.sv
+      |     -> ts.ral_mem_write_read_test.sv
+      |     -> ts.ral_reg_write_consecutive_read_test.sv
+      |     -> ts.ral_reg_write_read_test.sv
+      |     -> ts.reg_bit_bash_test.sv
+      |     -> ts.uvm_reg_mem_built_in_test.sv
+      |-> top.sv
+      |-> top_test.sv
+      |-> sim_build_options
+      |-> sim_run_options
+      |-> waves.tcl
+      |-> README 
+ 
+The AXI VIP interface definition file is located at:
+ 
+ Top level interface   : $DESIGNWARE_HOME/vip/svt/amba_svt/latest/sverilog/include/svt_axi_if.svi
+ Master Port interface : $DESIGNWARE_HOME/vip/svt/amba_svt/latest/sverilog/include/svt_axi_master_if.svi
+ Slave Port interface  : $DESIGNWARE_HOME/vip/svt/amba_svt/latest/sverilog/include/svt_axi_slave_if.svi
+ 
+When you run dw_vip_setup (above), the interfaces file will be installed at:
+
+  ./design_dir/include/sverilog/svt_axi_if.svi
+  ./design_dir/include/sverilog/svt_axi_master_if.svi
+  ./design_dir/include/sverilog/svt_axi_slave_if.svi
+
+-------------------------------------------------------------------------
+D. SystemVerilog Testbench Description
+-------------------------------------------------------------------------
+
+The  top-level testbench is written in SystemVerilog. The AXI interfaces are
+represented as instances of 'interface' objects. The DUT is represented as a
+module with 'interface' connections as its ports. The UVM verification
+environment is designed as a class that extends uvm_env named
+axi_intermediate_ral_env. All tests extend uvm_test. See the RAL section below for
+RAL extensions
+
+The file containing the top-level testbench in the example is "top.sv".
+SystemVerilog interfaces are instantiated in this module and are passed
+into the UVM environment using calls to uvm_config_db::set().  
+
+All test files are included in the top_test.sv file. All new tests must be 
+included here.
+
+The DUT used in the example is defined as a Verilog module within a SystemVerilog
+wrapper. The intent is to demonstrate how a legacy core may be integrated into a
+SystemVerilog testbench. The example DUT has one AXI System level interface
+instantiated.  System interface has two AXI protocol interface connections: AXI
+Slave interface and AXI Master interface. The behavior of the example DUT is to
+simply connect the inputs of one interface, to the outputs of the other. As a
+result, it requires two AXI (Master & Slave) interfaces to be configured
+identically. 
+
+The structural elements of the UVM test environment are encapsulated in
+axi_intermediate_ral_env.sv, which is instantiated in the the base test.  The tests
+get included by top.sv by including top_test.sv.
+
+The ral_axi_intermediate_slave.sv file is generated by the ralgen utility, where
+axi_intermediate_ral_slave.ralf is the input to the ralgen.
+
+
+-------------------------------------------------------------------------
+E. DVE Configuration File
+-------------------------------------------------------------------------
+
+The VCS simulator includes a GUI for debugging, and waveform viewing.  This GUI
+is named DVE (Discovery Visual Environment). To support the ability to quickly
+see the results of running the example, the example supplies a configuration
+file for DVE. The file is:
+
+"<design_dir>/examples/sverilog/amba_svt/tb_axi_svt_uvm_intermediate_ral_sys/waves.tcl"
+
+Using "WAVES=1" with  Makefile invocation, or the -w switch for the sim run
+script run_axi_svt_uvm_intermediate_ral_sys causes the SystemVerilog example
+testbench to produce a variable 'dump' file named "verilog.dump". The DVE
+configuration file loads this dump file, and sets up the waveform display. The
+waveform display groups the signals by AXI channels.
+
+-------------------------------------------------------------------------
+F. UVM Verification Environment Description
+-------------------------------------------------------------------------
+
+A complete description of the UVM environment (ENV) is beyond the scope of
+this README. Please refer to the UVM manual for details of a UVM environment.
+
+Following is a summary of the files used by the ENV:
+
+  - axi_intermediate_ral_env.sv
+    This file serves as environment class.  The top-level environment is
+    implemented by extending uvm_env base class.  This class instantiates the
+    AXI System ENV component and a virtual sequencer.
+
+  - axi_uvm_scoreboard.sv
+    This file implements a simple UVM scoreboard
+
+  - cust_svt_axi_system_configuration.sv
+    This file extends System configuration (svt_axi_system_configuration).
+    All the necessary configuration parameters are set up for the environment
+    in this class. Transaction level coverage is enabled in this class.
+
+  - cust_svt_axi_master_transaction.sv
+    This file extends the master transaction (svt_axi_master_transaction).
+    Customized constraints are defined by this class.
+
+  - axi_intermediate_reg2axi_adapter.sv
+    See below in the RAL section
+
+  - axi_master_random_discrete_virtual_sequence.sv
+    This file implements a virtual sequence executes an
+    axi_master_random_discrete_sequence on every master.  This sequence is
+    registered with the AXI System ENV virtual sequencer as the default
+    sequence for the main phase.
+
+  - axi_null_virtual_sequence.sv
+    This file implements a virtual sequence with an empty body method.  This
+    sequence can be used by extended tests to disable the default sequence.
+
+  - axi_master_random_discrete_sequence.sv
+    This file shows a sequence (extending from svt_axi_master_base_sequence)
+    that generates unconstrained random master transactions.  This is the
+    default sequence that set up by the base test.
+
+  - axi_master_directed_sequence.sv
+    This file shows a sequence (extending from svt_axi_master_base_sequence)
+    that generates a series of directed transactions.
+
+  - axi_master_random_wr_rd_sequence.sv
+    This file shows a sequence (extending from svt_axi_master_base_sequence)
+    that generates a random WRITE followed by a READ sequence.
+
+  - axi_slave_mem_response_sequence.sv
+    This response sequence is used by the directed_test. This sequence enables
+    a memory type response from a slave.
+    
+  - axi_slave_random_response_sequence.sv
+    This response sequence is used by the random_wr_rd_test. This sequence
+    generates a constrained random slave response.
+
+--------------------------------------------------------------------------
+G. RAL-specific information
+--------------------------------------------------------------------------
+
+The RAL description is in axi_intermediate_ral_slave.ralf. Compile it with the
+steps in section B. This produces the classes in ral_axi_intermediate_slave.sv
+that model the registers and their functional coverage. For example, the
+hardware register REGA is modeled with the SystemVerilog class ral_reg_REGA
+which has a single field FIELD1.
+
+The test ts.ral_access_single_write_read_test.sv writes and reads to the
+registers. For example, it writes to REGS with:
+
+	model.slave_block.REGA.write(status,exp1);
+
+These RAL reads and writes are processed by the class reg2axi_adapter of the VIP.
+The function reg2bus translates the above register command into an AXI UVM command. 
+The fields in the AXI commandare filled in by randomization so that any AXI VIP 
+constraints will be obeyed.
+
+The bus2reg function takes an AXI transaction and turns it into a register
+command. These commands are fairly simple so the fields are just copied from the
+AXI transaction.
+
+During simulation, the register commands are executed on the AXI RAL slave model
+in axi_reg_slave.sv. You can see these values by adding the following method at
+the end of your test
+
+   virtual function void report_phase(uvm_phase phase);
+      test_top.ral_slave.print();
+   endfunction : report_phase
+
+The register description places the four registers and memory with:
+
+  register REGA @32'h0000;
+  register REGB @32'h0004;
+  register REGC @32'h0008;
+  register REGD @32'h000c;
+  memory SLAVE_MEM @32'h0800;
+
+
+
+-----------------------------------------------------------------------------
+
+The axi_intermediate_ral_env.sv contains RAL extensions. The environment creates
+the register model with the class ral_sys_axi_intermediate_slave which is
+defined in ral_axi_intermediate_slave.sv, created when the RALF file is compiled.
+
+
+-----------------------------------------------------------------------------
+
+The test in ts.ral_backdoor_single_write_read_test.sv performs RAL reads and writes
+with the backdoor class my_regs_backdoor. In this example, there is no DUT with
+the registers; they are stored in the axi_slave_mem in the slave[0] agent. So
+the reads and writes are redirected to the first few locations in the memory.
+
+Note that all the registers have a separate callback object. 
+
+In a real system, the HDL_PATH in the RAL description would have the path to the
+RTL code for the registers.
+
+--------------------------------------------------------------------------
+H. Contacting Customer Support
+--------------------------------------------------------------------------
+Please contact Synopsys Support Center or local CAE for support.

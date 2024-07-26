@@ -1,0 +1,183 @@
+# Compile with
+# ralgen -uvm -t axi_intermediate_slave axi_intermediate_ral_slave.ralf
+
+
+register REGA {
+  bytes 4;
+  cover +a+b+f
+
+  field FIELD1 {
+    bits  32;
+    access rw;
+    coverpoint {
+      bins all_ones = { 4294967295 }
+    }
+    reset  32'h0000_0000;
+  }
+}
+
+register REGB {
+  bytes 4;
+  cover +a+b+f
+  
+  field FIELD1 (REGB1) {
+    bits  16;
+    access rw;
+    coverpoint {
+      bins all_ones = { 65535 }
+    }
+    reset  16'h0000;
+  }
+  
+  field FIELD2 (REGB2) {
+    bits  16;
+    access rw;
+    coverpoint {
+      bins all_ones = { 65535 }
+    }
+    reset  16'h0000;
+  }
+  
+}
+
+register REGC {
+  bytes 4;
+  cover +a+b+f
+  
+  field FIELD1 (REGC1) {
+    bits  8;
+    access rw;
+    coverpoint {
+      bins all_ones = { 255 }
+    }
+    reset  8'h00;
+  }
+  
+  field FIELD2 (REGC2) {
+    bits  8;
+    access rw;
+    coverpoint {
+      bins all_ones = { 255 }
+    }
+    reset  8'h00;
+  }
+
+  field FIELD3 (REGC3) {
+    bits  8;
+    access rw;
+    coverpoint {
+      bins all_ones = { 255 }
+    }
+    reset  8'h00;
+  }
+  
+  field FIELD4 (REGC4) {
+    bits  8;
+    access rw;
+    coverpoint {
+      bins all_ones = { 255 }
+    }
+    reset  8'h00;
+  }
+  
+}
+
+register REGD {
+  bytes 4;
+  cover +a+b+f
+  
+  field FIELD1 (REGD1) {
+    bits  4;
+    access rw;
+    coverpoint {
+      bins all_ones = { 15 }
+    }
+    reset  4'h0;
+  }
+  
+  field FIELD2 (REGD2) {
+    bits  4;
+    access rw;
+    coverpoint {
+      bins all_ones = { 15 }
+    }
+    reset  4'h0;
+  }
+
+  field FIELD3 (REGD3) {
+    bits  4;
+    access rw;
+    coverpoint {
+      bins all_ones = { 15 }
+    }
+    reset  4'h0;
+  }
+  
+  field FIELD4 (REGD4) {
+    bits  4;
+    access rw;
+    coverpoint {
+      bins all_ones = { 15 }
+    }
+    reset  4'h0;
+  }
+
+  field FIELD5 (REGD5) {
+    bits  4;
+    access rw;
+    coverpoint {
+      bins all_ones = { 15 }
+    }
+    reset  4'h0;
+  }
+  
+  field FIELD6 (REGD6) {
+    bits  4;
+    access rw;
+    coverpoint {
+      bins all_ones = { 15 }
+    }
+    reset  4'h0;
+  }
+
+  field FIELD7 (REGD7) {
+    bits  4;
+    access rw;
+    coverpoint {
+      bins all_ones = { 15 }
+    }
+    reset  4'h0;
+  }
+  
+  field FIELD8 (REGD8) {
+    bits  4;
+    access rw;
+    coverpoint {
+      bins all_ones = { 15 }
+    }
+    reset  4'h0;
+  }
+  
+}
+
+memory SLAVE_MEM {
+  size 256;
+  bits 32;
+  access rw;
+}
+
+block axi_intermediate_block {
+  cover +a+b+f
+  bytes 4;
+  register REGA (REGA) @32'h0000;	# No fields, specify register path
+  register REGB        @32'h0004;	# Use field names above
+  register REGC        @32'h0008;
+  register REGD        @32'h000c;
+
+  memory SLAVE_MEM (SLAVE_MEM) @32'h0800;
+}
+
+system axi_intermediate_slave {
+  bytes 4;
+  block axi_intermediate_block=slave_block (reg_slave);
+}
