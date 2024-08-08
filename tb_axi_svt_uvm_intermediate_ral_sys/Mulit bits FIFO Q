@@ -24,3 +24,7 @@ Output signals during reset
 dout - 0
 full - 0
 empty - 1
+
+
+Initially, resetn = 0 and the FIFO entries are reset.  Output dout is set to zero, and empty is set to one to indicate the FIFO is empty.  Reset signal is deasserted and the operation starts.  The second cycle has wr = 0, therefore din is not registered.  The subsquent cycle has wr = 1 thus din = 25'h105c5cc.  Output dout immediately shows the first-in data, with no latency between inputs and outputs.  Write-enable signal is asserted a few cycles later to capture another input, completely filling the FIFO.  Output full is then set to logic one.  Subsequent operations occur in a full FIFO.
+
